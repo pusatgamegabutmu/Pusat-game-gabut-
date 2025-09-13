@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domino Clothes Pin Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom right, #0f172a, #1e293b, #334155);
+            min-height: 100vh;
+            color: white;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin: 15px 0;
+        }
+        
+        h3 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+        
+        p {
+            text-align: center;
+            margin: 10px 0;
+            color: #e2e8f0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 10px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #64748b, #475569);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.4);
+        }
+        
+        .game-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .domino-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .domino {
+            width: 60px;
+            height: 100px;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            display: flex;
+            background: linear-gradient(to right, #f1f5f9, #e2e8f0);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .domino:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        .domino.selected {
+            border: 4px solid #3b82f6;
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        
+        .domino-half {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border-right: 1px solid #334155;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .domino-half:last-child {
+            border-right: none;
+        }
+        
+        .board-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 20px 0;
+            min-height: 120px;
+            align-items: center;
+        }
+        
+        .board-domino {
+            width: 60px;
+            height: 100px;
+            border: 2px solid #f1f5f9;
+            border-radius: 10px;
+            display: flex;
+            background: linear-gradient(to right, #8b5cf6, #7c3aed);
+            position: relative;
+            margin: 5px;
+        }
+        
+        .board-domino .domino-half {
+            border-right: 1px solid #f1f5f9;
+            color: white;
+        }
+        
+        .clothes-pin {
+            width: 8px;
+            height: 40px;
+            background-color: #dc2626;
+            border-radius: 4px;
+            margin: 2px;
+            transform: rotate(15deg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .clothes-pin.blue {
+            background-color: #2563eb;
+        }
+        
+        .pin-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .game-log {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+        
+        .game-log p {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .status {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .status.player {
+            background: linear-gradient(to right, #10b981, #059669);
+        }
+        
+        .status.computer {
+            background: linear-gradient(to right, #ef4444, #dc2626);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .domino, .board-domino {
+                width: 50px;
+                height: 80px;
+            }
+            
+            .domino-half {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Menu Screen -->
+        <div id="menu-screen" class="text-center">
+            <h1>DOMINO CLOTHES PIN</h1>
+            <p>A fun twist on classic dominoes! Lose a round? Get clipped with clothes pins!</p>
+            
+            <div class="game-section">
+                <h2>How to Play</h2>
+                <p>• Match numbers on dominoes to build a chain</p>
+                <p>• Be the first to play all your dominoes to win!</p>
+                <p>• Loser gets clothes pins equal to their remaining dots</p>
+                <p>• DOUBLE BLANKS? That's 10 extra clothes pins!</p>
+            </div>
+            
+            <button class="btn btn-primary" onclick="startGame()">START GAME</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <!-- Game Stats -->
+            <div class="game-section">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center mb-4 md:mb-0">
+                        <h3>PLAYER</h3>
+                        <div class="pin-container" id="player-pins"></div>
+                        <p>Clothes Pins: <span id="player-pin-count">0</span></p>
+                    </div>
+                    
+                    <div class="text-center mx-4 my-4 md:my-0">
+                        <div class="status" id="turn-status">YOUR TURN!</div>
+                    </div>
+                    
+                    <div class="text-center mb-4 md:mb-0">
+                        <h3>COMPUTER</h3>
+                        <div class="pin-container" id="computer-pins"></div>
+                        <p>Clothes Pins: <span id="computer-pin-count">0</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Domino Board -->
+            <div class="game-section">
+                <h2>DOMINO BOARD</h2>
+                <div class="board-container" id="board"></div>
+            </div>
+
+            <!-- Game Log -->
+            <div class="game-log" id="game-log">
+                <p>Game started! Player goes first.</p>
+            </div>
+
+            <!-- Player Hand -->
+            <div class="game-section">
+                <h2>YOUR HAND</h2>
+                <div class="domino-container" id="player-hand"></div>
+                <button class="btn btn-primary" onclick="playSelectedDomino()" id="play-btn" disabled>PLAY SELECTED DOMINO</button>
+            </div>
+
+            <!-- Computer Hand (Hidden) -->
+            <div class="game-section">
+                <h2>COMPUTER'S HAND</h2>
+                <div class="domino-container" id="computer-hand">
+                    <!-- Hidden dominoes will be shown as gray rectangles -->
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <p>Click on a domino in your hand to select it, then click "PLAY SELECTED DOMINO" to place it.</p>
+                <p>Try to get rid of all your dominoes before the computer!</p>
+                <p>Double blanks (like [6|6]) give 10 extra clothes pins to the loser!</p>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="hidden">
+            <h1>GAME OVER!</h1>
+            
+            <div class="game-section">
+                <div class="flex flex-col md:flex-row justify-center items-center gap-10">
+                    <div class="text-center">
+                        <h2>PLAYER</h2>
+                        <div class="pin-container" id="final-player-pins"></div>
+                        <p>Total Clothes Pins: <span id="final-player-pin-count">0</span></p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <h2>COMPUTER</h2>
+                        <div class="pin-container" id="final-computer-pins"></div>
+                        <p>Total Clothes Pins: <span id="final-computer-pin-count">0</span></p>
+                    </div>
+                </div>
+                
+                <h3 id="winner-message">Winner: TBD</h3>
+            </div>
+            
+            <div class="game-section">
+                <h2>Game Summary</h2>
+                <div class="game-log" id="final-game-log"></div>
+            </div>
+            
+            <div class="flex justify-center gap-4 mt-6">
+                <button class="btn btn-primary" onclick="startGame()">PLAY AGAIN</button>
+                <button class="btn btn-secondary" onclick="showMenu()">MAIN MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let gameState = 'menu'; // menu, playing, gameOver
+        let playerHand = [];
+        let computerHand = [];
+        let dominoBoard = [];
+        let currentPlayer = 'player';
+        let playerClothesPins = 0;
+        let computerClothesPins = 0;
+        let selectedDomino = null;
+        let gameLog = [];
+
+        // Initialize dominoes (0-6 pairs)
+        function generateDominoes() {
+            const dominoes = [];
+            for (let i = 0; i <= 6; i++) {
+                for (let j = i; j <= 6; j++) {
+                    dominoes.push([i, j]);
+                }
+            }
+            return dominoes;
+        }
+
+        // Deal initial hands
+        function dealHands() {
+            const allDominoes = [...generateDominoes()];
+            const shuffled = allDominoes.sort(() => Math.random() - 0.5);
+            
+            playerHand = shuffled.slice(0, 7);
+            computerHand = shuffled.slice(7, 14);
+            dominoBoard = [];
+            currentPlayer = 'player';
+            selectedDomino = null;
+            gameLog = ['Game started! Player goes first.'];
+            
+            // Check for double six to start
+            const playerHasDoubleSix = playerHand.some(d => d[0] === 6 && d[1] === 6);
+            const computerHasDoubleSix = computerHand.some(d => d[0] === 6 && d[1] === 6);
+            
+            if (playerHasDoubleSix) {
+                const doubleSix = playerHand.find(d => d[0] === 6 && d[1] === 6);
+                dominoBoard.push(doubleSix);
+                playerHand = playerHand.filter(d => !(d[0] === 6 && d[1] === 6));
+                gameLog.push('Player played Double Six to start!');
+                currentPlayer = 'computer';
+            } else if (computerHasDoubleSix) {
+                const doubleSix = computerHand.find(d => d[0] === 6 && d[1] === 6);
+                dominoBoard.push(doubleSix);
+                computerHand = computerHand.filter(d => !(d[0] === 6 && d[1] === 6));
+                gameLog.push('Computer played Double Six to start!');
+                currentPlayer = 'player';
+            }
+            
+            updateDisplay();
+        }
+
+        // Check if a domino can be played
+        function canPlayDomino(domino, board) {
+            if (board.length === 0) return true;
+            const leftEnd = board[0][0];
+            const rightEnd = board[board.length - 1][1];
+            return domino[0] === leftEnd || domino[1] === leftEnd || 
+                   domino[0] === rightEnd || domino[1] === rightEnd;
+        }
+
+        // Play a domino
+        function playDomino(domino, position = 'right') {
+            if (!canPlayDomino(domino, dominoBoard)) return false;
+
+            // Remove the played domino from hand
+            if (currentPlayer === 'player') {
+                playerHand = playerHand.filter(d => d !== domino);
+            } else {
+                computerHand = computerHand.filter(d => d !== domino);
+            }
+
+            // Determine which end to play on and flip if needed
+            let playedDomino = [...domino];
+            if (dominoBoard.length === 0) {
+                dominoBoard = [playedDomino];
+            } else {
+                const leftEnd = dominoBoard[0][0];
+                const rightEnd = dominoBoard[dominoBoard.length - 1][1];
+                
+                if (domino[0] === leftEnd) {
+                    playedDomino = [domino[1], domino[0]]; // Flip
+                    dominoBoard.unshift(playedDomino);
+                } else if (domino[1] === leftEnd) {
+                    dominoBoard.unshift(playedDomino);
+                } else if (domino[0] === rightEnd) {
+                    dominoBoard.push(playedDomino);
+                } else if (domino[1] === rightEnd) {
+                    playedDomino = [domino[1], domino[0]]; // Flip
+                    dominoBoard.push(playedDomino);
+                }
+            }
+
+            // Check for win condition
+            if ((currentPlayer === 'player' && playerHand.length === 0) || 
+                (currentPlayer === 'computer' && computerHand.length === 0)) {
+                // Winner found
+                const winner = currentPlayer;
+                const loser = currentPlayer === 'player' ? 'computer' : 'player';
+                
+                // Add clothes pins based on remaining tiles in loser's hand
+                let pinsToAdd = 0;
+                if (loser === 'player') {
+                    pinsToAdd = computerHand.reduce((sum, domino) => sum + domino[0] + domino[1], 0);
+                    if (computerHand.some(d => d[0] === d[1])) { // If any double
+                        pinsToAdd += 10; // Extra penalty for double
+                    }
+                    playerClothesPins += pinsToAdd;
+                    gameLog.push(`Computer wins! Player gets ${pinsToAdd} clothes pins!`);
+                } else {
+                    pinsToAdd = playerHand.reduce((sum, domino) => sum + domino[0] + domino[1], 0);
+                    if (playerHand.some(d => d[0] === d[1])) { // If any double
+                        pinsToAdd += 10; // Extra penalty for double
+                    }
+                    computerClothesPins += pinsToAdd;
+                    gameLog.push(`Player wins! Computer gets ${pinsToAdd} clothes pins!`);
+                }
+                
+                gameState = 'gameOver';
+                showGameOver();
+                return true;
+            }
+
+            // Check for blocked game (no one can play)
+            const playerCanPlay = playerHand.some(d => canPlayDomino(d, dominoBoard));
+            const computerCanPlay = computerHand.some(d => canPlayDomino(d, dominoBoard));
+            
+            if (!playerCanPlay && !computerCanPlay) {
+                // Game is blocked, calculate points
+                const playerPoints = playerHand.reduce((sum, domino) => sum + domino[0] + domino[1], 0);
+                const computerPoints = computerHand.reduce((sum, domino) => sum + domino[0] + domino[1], 0);
+                
+                if (playerPoints < computerPoints) {
+                    playerClothesPins += computerPoints;
+                    gameLog.push(`Game blocked! Player wins with ${playerPoints} points vs ${computerPoints}. Computer gets ${computerPoints} clothes pins!`);
+                } else if (computerPoints < playerPoints) {
+                    computerClothesPins += playerPoints;
+                    gameLog.push(`Game blocked! Computer wins with ${computerPoints} points vs ${playerPoints}. Player gets ${playerPoints} clothes pins!`);
+                } else {
+                    gameLog.push(`Game blocked! It's a tie! No clothes pins awarded.`);
+                }
+                
+                gameState = 'gameOver';
+                showGameOver();
+                return true;
+            }
+
+            // Switch turn
+            currentPlayer = currentPlayer === 'player' ? 'computer' : 'player';
+            selectedDomino = null;
+            updateDisplay();
+
+            // Computer makes a move if it's its turn
+            if (currentPlayer === 'computer') {
+                setTimeout(makeComputerMove, 1000);
+            }
+            
+            return true;
+        }
+
+        // Computer AI - simple strategy: play first available domino
+        function makeComputerMove() {
+            if (gameState !== 'playing') return;
+            
+            const playableDominoes = computerHand.filter(d => canPlayDomino(d, dominoBoard));
+            
+            if (playableDominoes.length > 0) {
+                const chosenDomino = playableDominoes[0]; // Simple strategy: pick first available
+                playDomino(chosenDomino);
+                gameLog.push(`Computer played [${chosenDomino[0]}|${chosenDomino[1]}]`);
+            } else {
+                // Computer passes
+                gameLog.push(`Computer passes (no valid moves)`);
+                currentPlayer = 'player';
+            }
+            
+            updateDisplay();
+        }
+
+        // Update the display
+        function updateDisplay() {
+            renderPlayerHand();
+            renderComputerHand();
+            renderBoard();
+            renderPins();
+            renderTurnStatus();
+            renderGameLog();
+            updatePlayButton();
+        }
+
+        // Render player hand
+        function renderPlayerHand() {
+            const container = document.getElementById('player-hand');
+            container.innerHTML = '';
+            
+            playerHand.forEach(domino => {
+                const dominoElement = document.createElement('div');
+                dominoElement.className = `domino ${selectedDomino && selectedDomino[0] === domino[0] && selectedDomino[1] === domino[1] ? 'selected' : ''}`;
+                dominoElement.onclick = () => selectDomino(domino);
+                
+                const leftHalf = document.createElement('div');
+                leftHalf.className = 'domino-half';
+                leftHalf.textContent = domino[0];
+                
+                const rightHalf = document.createElement('div');
+                rightHalf.className = 'domino-half';
+                rightHalf.textContent = domino[1];
+                
+                dominoElement.appendChild(leftHalf);
+                dominoElement.appendChild(rightHalf);
+                container.appendChild(dominoElement);
+            });
+        }
+
+        // Render computer hand (hidden)
+        function renderComputerHand() {
+            const container = document.getElementById('computer-hand');
+            container.innerHTML = '';
+            
+            computerHand.forEach(() => {
+                const dominoElement = document.createElement('div');
+                dominoElement.className = 'domino';
+                dominoElement.style.background = 'linear-gradient(to right, #6b7280, #475569)';
+                dominoElement.style.border = '2px solid #334155';
+                
+                const leftHalf = document.createElement('div');
+                leftHalf.className = 'domino-half';
+                leftHalf.textContent = '?';
+                leftHalf.style.color = 'white';
+                
+                const rightHalf = document.createElement('div');
+                rightHalf.className = 'domino-half';
+                rightHalf.textContent = '?';
+                rightHalf.style.color = 'white';
+                
+                dominoElement.appendChild(leftHalf);
+                dominoElement.appendChild(rightHalf);
+                container.appendChild(dominoElement);
+            });
+        }
+
+        // Render board
+        function renderBoard() {
+            const container = document.getElementById('board');
+            container.innerHTML = '';
+            
+            if (dominoBoard.length === 0) {
+                const message = document.createElement('p');
+                message.textContent = 'No dominoes played yet';
+                message.style.color = '#e2e8f0';
+                container.appendChild(message);
+                return;
+            }
+            
+            dominoBoard.forEach(domino => {
+                const dominoElement = document.createElement('div');
+                dominoElement.className = 'board-domino';
+                
+                const leftHalf = document.createElement('div');
+                leftHalf.className = 'domino-half';
+                leftHalf.textContent = domino[0];
+                
+                const rightHalf = document.createElement('div');
+                rightHalf.className = 'domino-half';
+                rightHalf.textContent = domino[1];
+                
+                dominoElement.appendChild(leftHalf);
+                dominoElement.appendChild(rightHalf);
+                container.appendChild(dominoElement);
+            });
+        }
+
+        // Render clothes pins
+        function renderPins() {
+            const playerContainer = document.getElementById('player-pins');
+            const computerContainer = document.getElementById('computer-pins');
+            const finalPlayerContainer = document.getElementById('final-player-pins');
+            const finalComputerContainer = document.getElementById('final-computer-pins');
+            
+            // Clear existing pins
+            playerContainer.innerHTML = '';
+            computerContainer.innerHTML = '';
+            finalPlayerContainer.innerHTML = '';
+            finalComputerContainer.innerHTML = '';
+            
+            // Render current pins
+            for (let i = 0; i < playerClothesPins; i++) {
+                const pin = document.createElement('div');
+                pin.className = 'clothes-pin';
+                playerContainer.appendChild(pin);
+            }
+            
+            for (let i = 0; i < computerClothesPins; i++) {
+                const pin = document.createElement('div');
+                pin.className = 'clothes-pin blue';
+                computerContainer.appendChild(pin);
+            }
+            
+            // Render final pins (for game over screen)
+            for (let i = 0; i < playerClothesPins; i++) {
+                const pin = document.createElement('div');
+                pin.className = 'clothes-pin';
+                finalPlayerContainer.appendChild(pin);
+            }
+            
+            for (let i = 0; i < computerClothesPins; i++) {
+                const pin = document.createElement('div');
+                pin.className = 'clothes-pin blue';
+                finalComputerContainer.appendChild(pin);
+            }
+            
+            // Update pin counts
+            document.getElementById('player-pin-count').textContent = playerClothesPins;
+            document.getElementById('computer-pin-count').textContent = computerClothesPins;
+            document.getElementById('final-player-pin-count').textContent = playerClothesPins;
+            document.getElementById('final-computer-pin-count').textContent = computerClothesPins;
+        }
+
+        // Render turn status
+        function renderTurnStatus() {
+            const status = document.getElementById('turn-status');
+            status.textContent = currentPlayer === 'player' ? 'YOUR TURN!' : "COMPUTER'S TURN";
+            status.className = `status ${currentPlayer === 'player' ? 'player' : 'computer'}`;
+        }
+
+        // Render game log
+        function renderGameLog() {
+            const logContainer = document.getElementById('game-log');
+            logContainer.innerHTML = '';
+            
+            const lastLogs = gameLog.slice(-5);
+            lastLogs.forEach(log => {
+                const p = document.createElement('p');
+                p.textContent = log;
+                logContainer.appendChild(p);
+            });
+        }
+
+        // Update play button state
+        function updatePlayButton() {
+            const playBtn = document.getElementById('play-btn');
+            playBtn.disabled = !selectedDomino || currentPlayer !== 'player';
+        }
+
+        // Select a domino
+        function selectDomino(domino) {
+            if (currentPlayer !== 'player') return;
+            
+            if (selectedDomino && selectedDomino[0] === domino[0] && selectedDomino[1] === domino[1]) {
+                selectedDomino = null;
+            } else {
+                selectedDomino = domino;
+            }
+            
+            updateDisplay();
+        }
+
+        // Play selected domino
+        function playSelectedDomino() {
+            if (selectedDomino && currentPlayer === 'player') {
+                playDomino(selectedDomino);
+            }
+        }
+
+        // Show game over screen
+        function showGameOver() {
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.remove('hidden');
+            
+            // Show winner
+            const winnerMessage = document.getElementById('winner-message');
+            if (playerClothesPins < computerClothesPins) {
+                winnerMessage.textContent = "🎉 PLAYER WINS!";
+                winnerMessage.style.color = "#10b981";
+            } else if (computerClothesPins < playerClothesPins) {
+                winnerMessage.textContent = "💻 COMPUTER WINS!";
+                winnerMessage.style.color = "#ef4444";
+            } else {
+                winnerMessage.textContent = "🤝 IT'S A TIE!";
+                winnerMessage.style.color = "#fbbf24";
+            }
+            
+            // Show final game log
+            const finalLog = document.getElementById('final-game-log');
+            finalLog.innerHTML = '';
+            gameLog.forEach(log => {
+                const p = document.createElement('p');
+                p.textContent = log;
+                finalLog.appendChild(p);
+            });
+        }
+
+        // Show menu screen
+        function showMenu() {
+            document.getElementById('menu-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+        }
+
+        // Start game
+        function startGame() {
+            playerClothesPins = 0;
+            computerClothesPins = 0;
+            gameState = 'playing';
+            selectedDomino = null;
+            gameLog = [];
+            
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            dealHands();
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            // Set up event listeners
+            document.getElementById('play-btn').addEventListener('click', playSelectedDomino);
+        };
+    </script>
+</body>
+</html>
