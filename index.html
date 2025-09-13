@@ -3,368 +3,566 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domino Clothes Pin Game</title>
+    <title>Domino Clothes Pin - UNO Mobile Style</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(to bottom right, #0f172a, #1e293b, #334155);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: white;
-            padding: 10px;
+            overflow: hidden;
+            padding: 0;
+            position: relative;
         }
-        
+
         .container {
-            max-width: 800px;
+            max-width: 480px;
             margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            position: relative;
         }
-        
-        h1 {
+
+        /* Header */
+        .header {
             text-align: center;
-            font-size: 2.5rem;
-            margin: 20px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        
-        h2 {
-            text-align: center;
-            font-size: 1.8rem;
-            margin: 15px 0;
-        }
-        
-        h3 {
-            text-align: center;
+            padding: 15px 0;
             font-size: 1.5rem;
-            margin: 10px 0;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: -0.5px;
         }
-        
-        p {
-            text-align: center;
+
+        /* Game Board Area */
+        .board-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .board-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            max-width: 90%;
+        }
+
+        .domino-card {
+            width: 50px;
+            height: 90px;
+            background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
+            border-radius: 15px;
+            border: 3px solid rgba(255,255,255,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1e293b;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin: 0 5px;
+        }
+
+        .domino-card.selected {
+            transform: scale(1.1) translateY(-10px);
+            border-color: #3b82f6;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
+            z-index: 10;
+        }
+
+        .domino-card.board {
+            background: linear-gradient(to bottom, #8b5cf6, #7c3aed);
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .domino-number {
+            display: block;
+            margin: 2px 0;
+            line-height: 1;
+        }
+
+        .domino-divider {
+            width: 80%;
+            height: 1px;
+            background: rgba(0,0,0,0.2);
+            margin: 5px 0;
+        }
+
+        /* Game Log */
+        .game-log {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 12px;
             margin: 10px 0;
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            line-height: 1.4;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .game-log p {
+            margin: 4px 0;
+            padding: 3px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Player Hand */
+        .player-hand {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 15px 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .player-hand::-webkit-scrollbar {
+            display: none;
+        }
+
+        .player-hand .domino-card {
+            width: 50px;
+            height: 90px;
+            margin: 0 5px;
+            transform-origin: center bottom;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Computer Hand (Hidden) */
+        .computer-hand {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 0;
+            margin-bottom: 15px;
+        }
+
+        .computer-card-placeholder {
+            width: 50px;
+            height: 90px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            border: 1px dashed rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Action Button */
+        .action-btn {
+            width: 90%;
+            max-width: 300px;
+            margin: 15px auto 20px;
+            padding: 18px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+            background: linear-gradient(to right, #ef4444, #dc2626);
+        }
+
+        .action-btn:disabled {
+            background: linear-gradient(to right, #6b7280, #475569);
+            cursor: not-allowed;
+            transform: scale(0.95);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pin-icon {
+            width: 12px;
+            height: 40px;
+            background: #dc2626;
+            border-radius: 3px;
+            transform: rotate(15deg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .pin-icon.blue {
+            background: #2563eb;
+        }
+
+        /* Menu Screen */
+        .menu-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .menu-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .menu-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .how-to-play {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .how-to-play h3 {
+            color: #fbbf24;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .how-to-play ul {
+            padding-left: 20px;
+        }
+
+        .how-to-play li {
+            margin-bottom: 8px;
             color: #e2e8f0;
         }
-        
-        .btn {
+
+        /* Game Over Overlay */
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-over-content {
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .game-over-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #1e293b;
+            font-weight: bold;
+        }
+
+        .winner-indicator {
+            font-size: 2rem;
+            margin: 15px 0;
+            font-weight: bold;
+            padding: 12px 30px;
+            border-radius: 30px;
             display: inline-block;
-            padding: 12px 24px;
-            margin: 10px;
+        }
+
+        .winner-player {
+            background: linear-gradient(to right, #10b981, #059669);
+            color: white;
+        }
+
+        .winner-computer {
+            background: linear-gradient(to right, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .winner-tie {
+            background: linear-gradient(to right, #fbbf24, #d97706);
+            color: #1e293b;
+        }
+
+        .final-pins {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .final-pin-group {
+            text-align: center;
+        }
+
+        .final-pin-group h3 {
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-size: 1.2rem;
+        }
+
+        .final-pin-count {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .final-pin-display {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            margin-top: 10px;
+        }
+
+        .clothes-pin {
+            width: 8px;
+            height: 40px;
+            background-color: #dc2626;
+            border-radius: 4px;
+            transform: rotate(15deg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .clothes-pin.blue {
+            background-color: #2563eb;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-large {
+            flex: 1;
+            padding: 16px;
             border: none;
             border-radius: 50px;
             font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
         }
-        
+
         .btn-primary {
             background: linear-gradient(to right, #ef4444, #dc2626);
             color: white;
         }
-        
-        .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-        }
-        
+
         .btn-secondary {
             background: linear-gradient(to right, #64748b, #475569);
             color: white;
         }
-        
-        .btn-secondary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.4);
-        }
-        
-        .game-section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            margin: 20px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-        
-        .domino-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .domino {
-            width: 60px;
-            height: 100px;
-            border: 2px solid #334155;
-            border-radius: 10px;
-            display: flex;
-            background: linear-gradient(to right, #f1f5f9, #e2e8f0);
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-        
-        .domino:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-        
-        .domino.selected {
-            border: 4px solid #3b82f6;
-            transform: scale(1.1);
-            z-index: 10;
-        }
-        
-        .domino-half {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 5px;
-            border-right: 1px solid #334155;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #1e293b;
-        }
-        
-        .domino-half:last-child {
-            border-right: none;
-        }
-        
-        .board-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin: 20px 0;
-            min-height: 120px;
-            align-items: center;
-        }
-        
-        .board-domino {
-            width: 60px;
-            height: 100px;
-            border: 2px solid #f1f5f9;
-            border-radius: 10px;
-            display: flex;
-            background: linear-gradient(to right, #8b5cf6, #7c3aed);
-            position: relative;
-            margin: 5px;
-        }
-        
-        .board-domino .domino-half {
-            border-right: 1px solid #f1f5f9;
-            color: white;
-        }
-        
-        .clothes-pin {
-            width: 8px;
-            height: 40px;
-            background-color: #dc2626;
-            border-radius: 4px;
-            margin: 2px;
-            transform: rotate(15deg);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .clothes-pin.blue {
-            background-color: #2563eb;
-        }
-        
-        .pin-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 10px 0;
-        }
-        
-        .game-log {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 15px 0;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-            color: #e2e8f0;
-        }
-        
-        .game-log p {
-            margin: 5px 0;
-            padding: 5px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .status {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 10px;
-            display: inline-block;
-        }
-        
-        .status.player {
-            background: linear-gradient(to right, #10b981, #059669);
-        }
-        
-        .status.computer {
-            background: linear-gradient(to right, #ef4444, #dc2626);
-        }
-        
+
+        /* Hidden classes */
         .hidden {
-            display: none;
+            display: none !important;
         }
-        
-        .instructions {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 15px 0;
-            font-size: 0.9rem;
-            line-height: 1.6;
+
+        /* Animation for card flip */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
-        
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2rem;
-            }
-            
-            h2 {
-                font-size: 1.5rem;
-            }
-            
-            .domino, .board-domino {
-                width: 50px;
-                height: 80px;
-            }
-            
-            .domino-half {
-                font-size: 1.2rem;
-            }
-            
-            .btn {
-                padding: 10px 20px;
-                font-size: 1rem;
-            }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .loading span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin: 0 4px;
+            border-radius: 50%;
+            background: white;
+            animation: loading 1.4s infinite ease-in-out;
+        }
+
+        .loading span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loading {
+            0%, 100% { transform: scale(0); }
+            50% { transform: scale(1); }
+        }
+
+        /* Touch optimization */
+        .domino-card, .action-btn {
+            touch-action: manipulation;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Menu Screen -->
-        <div id="menu-screen" class="text-center">
-            <h1>DOMINO CLOTHES PIN</h1>
-            <p>A fun twist on classic dominoes! Lose a round? Get clipped with clothes pins!</p>
-            
-            <div class="game-section">
-                <h2>How to Play</h2>
-                <p>• Match numbers on dominoes to build a chain</p>
-                <p>• Be the first to play all your dominoes to win!</p>
-                <p>• Loser gets clothes pins equal to their remaining dots</p>
-                <p>• DOUBLE BLANKS? That's 10 extra clothes pins!</p>
-            </div>
-            
-            <button class="btn btn-primary" onclick="startGame()">START GAME</button>
+    <!-- MENU SCREEN -->
+    <div id="menu-screen" class="menu-screen">
+        <h1 class="menu-title">DOMINO CLOTHES PIN</h1>
+        <p class="menu-subtitle">A fun twist on classic dominoes! Lose? Get clipped with clothes pins!</p>
+        
+        <div class="how-to-play">
+            <h3>How to Play</h3>
+            <ul>
+                <li>Match numbers on dominoes to build a chain</li>
+                <li>Be the first to play all your dominoes to win!</li>
+                <li>Loser gets clothes pins equal to their remaining dots</li>
+                <li>DOUBLE BLANKS? That's 10 extra clothes pins!</li>
+                <li>Tap a domino in your hand to select it, then tap PLAY</li>
+            </ul>
         </div>
 
-        <!-- Game Screen -->
-        <div id="game-screen" class="hidden">
-            <!-- Game Stats -->
-            <div class="game-section">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <div class="text-center mb-4 md:mb-0">
-                        <h3>PLAYER</h3>
-                        <div class="pin-container" id="player-pins"></div>
-                        <p>Clothes Pins: <span id="player-pin-count">0</span></p>
-                    </div>
-                    
-                    <div class="text-center mx-4 my-4 md:my-0">
-                        <div class="status" id="turn-status">YOUR TURN!</div>
-                    </div>
-                    
-                    <div class="text-center mb-4 md:mb-0">
-                        <h3>COMPUTER</h3>
-                        <div class="pin-container" id="computer-pins"></div>
-                        <p>Clothes Pins: <span id="computer-pin-count">0</span></p>
-                    </div>
-                </div>
+        <button class="action-btn" onclick="startGame()">START GAME</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="container hidden">
+        <div class="header">DOMINO CLOTHES PIN</div>
+
+        <div class="status-bar">
+            <div class="status-indicator">
+                <span>Player:</span>
+                <div class="pin-icon" id="player-pin-icon"></div>
+                <span id="player-pin-count">0</span>
+            </div>
+            <div class="status-indicator">
+                <span>Computer:</span>
+                <div class="pin-icon blue" id="computer-pin-icon"></div>
+                <span id="computer-pin-count">0</span>
+            </div>
+        </div>
+
+        <div class="board-area">
+            <div class="computer-hand">
+                <div class="computer-card-placeholder">?</div>
+                <div class="computer-card-placeholder">?</div>
+                <div class="computer-card-placeholder">?</div>
+                <div class="computer-card-placeholder">?</div>
+                <div class="computer-card-placeholder">?</div>
+                <div class="computer-card-placeholder">?</div>
+                <div class="computer-card-placeholder">?</div>
             </div>
 
-            <!-- Domino Board -->
-            <div class="game-section">
-                <h2>DOMINO BOARD</h2>
-                <div class="board-container" id="board"></div>
+            <div class="board-container" id="board">
+                <!-- Domino cards will be inserted here -->
             </div>
 
-            <!-- Game Log -->
             <div class="game-log" id="game-log">
                 <p>Game started! Player goes first.</p>
             </div>
 
-            <!-- Player Hand -->
-            <div class="game-section">
-                <h2>YOUR HAND</h2>
-                <div class="domino-container" id="player-hand"></div>
-                <button class="btn btn-primary" onclick="playSelectedDomino()" id="play-btn" disabled>PLAY SELECTED DOMINO</button>
-            </div>
-
-            <!-- Computer Hand (Hidden) -->
-            <div class="game-section">
-                <h2>COMPUTER'S HAND</h2>
-                <div class="domino-container" id="computer-hand">
-                    <!-- Hidden dominoes will be shown as gray rectangles -->
-                </div>
-            </div>
-
-            <!-- Instructions -->
-            <div class="instructions">
-                <p>Click on a domino in your hand to select it, then click "PLAY SELECTED DOMINO" to place it.</p>
-                <p>Try to get rid of all your dominoes before the computer!</p>
-                <p>Double blanks (like [6|6]) give 10 extra clothes pins to the loser!</p>
+            <div class="player-hand" id="player-hand">
+                <!-- Player's domino cards will be inserted here -->
             </div>
         </div>
 
-        <!-- Game Over Screen -->
-        <div id="game-over-screen" class="hidden">
-            <h1>GAME OVER!</h1>
+        <button class="action-btn" id="play-btn" disabled>PLAY</button>
+    </div>
+
+    <!-- GAME OVER SCREEN -->
+    <div id="game-over-screen" class="game-over-overlay hidden">
+        <div class="game-over-content">
+            <h1 class="game-over-title">GAME OVER!</h1>
+            <div class="winner-indicator" id="winner-indicator">Winner: TBD</div>
             
-            <div class="game-section">
-                <div class="flex flex-col md:flex-row justify-center items-center gap-10">
-                    <div class="text-center">
-                        <h2>PLAYER</h2>
-                        <div class="pin-container" id="final-player-pins"></div>
-                        <p>Total Clothes Pins: <span id="final-player-pin-count">0</span></p>
-                    </div>
-                    
-                    <div class="text-center">
-                        <h2>COMPUTER</h2>
-                        <div class="pin-container" id="final-computer-pins"></div>
-                        <p>Total Clothes Pins: <span id="final-computer-pin-count">0</span></p>
-                    </div>
+            <div class="final-pins">
+                <div class="final-pin-group">
+                    <h3>PLAYER</h3>
+                    <div class="final-pin-count" id="final-player-pin-count">0</div>
+                    <div class="final-pin-display" id="final-player-pins"></div>
                 </div>
                 
-                <h3 id="winner-message">Winner: TBD</h3>
+                <div class="final-pin-group">
+                    <h3>COMPUTER</h3>
+                    <div class="final-pin-count" id="final-computer-pin-count">0</div>
+                    <div class="final-pin-display" id="final-computer-pins"></div>
+                </div>
             </div>
             
-            <div class="game-section">
-                <h2>Game Summary</h2>
-                <div class="game-log" id="final-game-log"></div>
-            </div>
+            <div class="game-log" id="final-game-log"></div>
             
-            <div class="flex justify-center gap-4 mt-6">
-                <button class="btn btn-primary" onclick="startGame()">PLAY AGAIN</button>
-                <button class="btn btn-secondary" onclick="showMenu()">MAIN MENU</button>
+            <div class="btn-group">
+                <button class="btn-large btn-primary" onclick="startGame()">PLAY AGAIN</button>
+                <button class="btn-large btn-secondary" onclick="showMenu()">MAIN MENU</button>
             </div>
         </div>
     </div>
@@ -527,7 +725,7 @@
 
             // Computer makes a move if it's its turn
             if (currentPlayer === 'computer') {
-                setTimeout(makeComputerMove, 1000);
+                setTimeout(makeComputerMove, 1500);
             }
             
             return true;
@@ -555,7 +753,6 @@
         // Update the display
         function updateDisplay() {
             renderPlayerHand();
-            renderComputerHand();
             renderBoard();
             renderPins();
             renderTurnStatus();
@@ -570,46 +767,23 @@
             
             playerHand.forEach(domino => {
                 const dominoElement = document.createElement('div');
-                dominoElement.className = `domino ${selectedDomino && selectedDomino[0] === domino[0] && selectedDomino[1] === domino[1] ? 'selected' : ''}`;
+                dominoElement.className = `domino-card ${selectedDomino && selectedDomino[0] === domino[0] && selectedDomino[1] === domino[1] ? 'selected' : ''}`;
                 dominoElement.onclick = () => selectDomino(domino);
                 
-                const leftHalf = document.createElement('div');
-                leftHalf.className = 'domino-half';
-                leftHalf.textContent = domino[0];
+                const topNum = document.createElement('div');
+                topNum.className = 'domino-number';
+                topNum.textContent = domino[0];
                 
-                const rightHalf = document.createElement('div');
-                rightHalf.className = 'domino-half';
-                rightHalf.textContent = domino[1];
+                const divider = document.createElement('div');
+                divider.className = 'domino-divider';
                 
-                dominoElement.appendChild(leftHalf);
-                dominoElement.appendChild(rightHalf);
-                container.appendChild(dominoElement);
-            });
-        }
-
-        // Render computer hand (hidden)
-        function renderComputerHand() {
-            const container = document.getElementById('computer-hand');
-            container.innerHTML = '';
-            
-            computerHand.forEach(() => {
-                const dominoElement = document.createElement('div');
-                dominoElement.className = 'domino';
-                dominoElement.style.background = 'linear-gradient(to right, #6b7280, #475569)';
-                dominoElement.style.border = '2px solid #334155';
+                const bottomNum = document.createElement('div');
+                bottomNum.className = 'domino-number';
+                bottomNum.textContent = domino[1];
                 
-                const leftHalf = document.createElement('div');
-                leftHalf.className = 'domino-half';
-                leftHalf.textContent = '?';
-                leftHalf.style.color = 'white';
-                
-                const rightHalf = document.createElement('div');
-                rightHalf.className = 'domino-half';
-                rightHalf.textContent = '?';
-                rightHalf.style.color = 'white';
-                
-                dominoElement.appendChild(leftHalf);
-                dominoElement.appendChild(rightHalf);
+                dominoElement.appendChild(topNum);
+                dominoElement.appendChild(divider);
+                dominoElement.appendChild(bottomNum);
                 container.appendChild(dominoElement);
             });
         }
@@ -623,55 +797,45 @@
                 const message = document.createElement('p');
                 message.textContent = 'No dominoes played yet';
                 message.style.color = '#e2e8f0';
+                message.style.fontSize = '0.9rem';
+                message.style.textAlign = 'center';
                 container.appendChild(message);
                 return;
             }
             
             dominoBoard.forEach(domino => {
                 const dominoElement = document.createElement('div');
-                dominoElement.className = 'board-domino';
+                dominoElement.className = 'domino-card board';
                 
-                const leftHalf = document.createElement('div');
-                leftHalf.className = 'domino-half';
-                leftHalf.textContent = domino[0];
+                const topNum = document.createElement('div');
+                topNum.className = 'domino-number';
+                topNum.textContent = domino[0];
                 
-                const rightHalf = document.createElement('div');
-                rightHalf.className = 'domino-half';
-                rightHalf.textContent = domino[1];
+                const divider = document.createElement('div');
+                divider.className = 'domino-divider';
                 
-                dominoElement.appendChild(leftHalf);
-                dominoElement.appendChild(rightHalf);
+                const bottomNum = document.createElement('div');
+                bottomNum.className = 'domino-number';
+                bottomNum.textContent = domino[1];
+                
+                dominoElement.appendChild(topNum);
+                dominoElement.appendChild(divider);
+                dominoElement.appendChild(bottomNum);
                 container.appendChild(dominoElement);
             });
         }
 
         // Render clothes pins
         function renderPins() {
-            const playerContainer = document.getElementById('player-pins');
-            const computerContainer = document.getElementById('computer-pins');
+            document.getElementById('player-pin-count').textContent = playerClothesPins;
+            document.getElementById('computer-pin-count').textContent = computerClothesPins;
+            
             const finalPlayerContainer = document.getElementById('final-player-pins');
             const finalComputerContainer = document.getElementById('final-computer-pins');
             
-            // Clear existing pins
-            playerContainer.innerHTML = '';
-            computerContainer.innerHTML = '';
             finalPlayerContainer.innerHTML = '';
             finalComputerContainer.innerHTML = '';
             
-            // Render current pins
-            for (let i = 0; i < playerClothesPins; i++) {
-                const pin = document.createElement('div');
-                pin.className = 'clothes-pin';
-                playerContainer.appendChild(pin);
-            }
-            
-            for (let i = 0; i < computerClothesPins; i++) {
-                const pin = document.createElement('div');
-                pin.className = 'clothes-pin blue';
-                computerContainer.appendChild(pin);
-            }
-            
-            // Render final pins (for game over screen)
             for (let i = 0; i < playerClothesPins; i++) {
                 const pin = document.createElement('div');
                 pin.className = 'clothes-pin';
@@ -684,18 +848,26 @@
                 finalComputerContainer.appendChild(pin);
             }
             
-            // Update pin counts
-            document.getElementById('player-pin-count').textContent = playerClothesPins;
-            document.getElementById('computer-pin-count').textContent = computerClothesPins;
             document.getElementById('final-player-pin-count').textContent = playerClothesPins;
             document.getElementById('final-computer-pin-count').textContent = computerClothesPins;
         }
 
         // Render turn status
         function renderTurnStatus() {
-            const status = document.getElementById('turn-status');
-            status.textContent = currentPlayer === 'player' ? 'YOUR TURN!' : "COMPUTER'S TURN";
-            status.className = `status ${currentPlayer === 'player' ? 'player' : 'computer'}`;
+            const statusText = document.querySelector('.status-bar .status-indicator:nth-child(1)');
+            const statusText2 = document.querySelector('.status-bar .status-indicator:nth-child(2)');
+            
+            if (currentPlayer === 'player') {
+                statusText.style.fontWeight = 'bold';
+                statusText.style.color = '#10b981';
+                statusText2.style.fontWeight = 'normal';
+                statusText2.style.color = 'white';
+            } else {
+                statusText.style.fontWeight = 'normal';
+                statusText.style.color = 'white';
+                statusText2.style.fontWeight = 'bold';
+                statusText2.style.color = '#ef4444';
+            }
         }
 
         // Render game log
@@ -744,16 +916,16 @@
             document.getElementById('game-over-screen').classList.remove('hidden');
             
             // Show winner
-            const winnerMessage = document.getElementById('winner-message');
+            const winnerIndicator = document.getElementById('winner-indicator');
             if (playerClothesPins < computerClothesPins) {
-                winnerMessage.textContent = "🎉 PLAYER WINS!";
-                winnerMessage.style.color = "#10b981";
+                winnerIndicator.textContent = "🎉 PLAYER WINS!";
+                winnerIndicator.className = "winner-indicator winner-player";
             } else if (computerClothesPins < playerClothesPins) {
-                winnerMessage.textContent = "💻 COMPUTER WINS!";
-                winnerMessage.style.color = "#ef4444";
+                winnerIndicator.textContent = "💻 COMPUTER WINS!";
+                winnerIndicator.className = "winner-indicator winner-computer";
             } else {
-                winnerMessage.textContent = "🤝 IT'S A TIE!";
-                winnerMessage.style.color = "#fbbf24";
+                winnerIndicator.textContent = "🤝 IT'S A TIE!";
+                winnerIndicator.className = "winner-indicator winner-tie";
             }
             
             // Show final game log
@@ -790,7 +962,6 @@
 
         // Initialize on load
         window.onload = function() {
-            // Set up event listeners
             document.getElementById('play-btn').addEventListener('click', playSelectedDomino);
         };
     </script>
